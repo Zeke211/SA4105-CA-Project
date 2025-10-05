@@ -16,16 +16,16 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String productName;
-    // private double unitPrice;
+    private double unitPrice;
     // private double discount;
     // private double tax;
-    // private double itemTotal;
+    private double itemTotal;
 
     @ManyToOne
     private Product product;
 
-    @ManyToOne
-    private Order order;
+    // @ManyToOne
+    // private Order order;
 
     public OrderItem() {
 
@@ -33,9 +33,9 @@ public class OrderItem {
 
     public OrderItem(String productName, double unitPrice, double discount, double tax, double itemTotal) {
         this.productName = productName;
-        // this.unitPrice=unitPrice;
+        this.unitPrice = unitPrice;
         // this.discount=discount;
         // this.tax=tax;
-        // this.itemTotal=itemTotal;
+        this.itemTotal = itemTotal;
     }
 }
