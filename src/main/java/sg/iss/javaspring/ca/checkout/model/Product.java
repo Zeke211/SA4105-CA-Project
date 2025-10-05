@@ -19,7 +19,7 @@ public class Product {
     private int id;
     // private String description;
     private String name;
-    // private double unitPrice;
+    private double unitPrice;
     // private int stock;
     // private String category;
     // private String brand;
@@ -30,6 +30,9 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<CartItem> cartItems;
 
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
+
     public Product() {
     }
 
@@ -37,7 +40,7 @@ public class Product {
             String tags, String handle, String imageURL) {
         // this.description = description;
         this.name = name;
-        // this.unitPrice = unitPrice;
+        this.unitPrice = unitPrice;
         // this.stock = stock;
         // this.category = category;
         // this.brand = brand;

@@ -21,8 +21,8 @@ public class CartItem {
     @ManyToOne
     private Product product;
 
-    // @ManyToOne
-    // private ShoppingCart shoppingCart;
+    @ManyToOne
+    private ShoppingCart shoppingCart;
 
     public CartItem() {
     }

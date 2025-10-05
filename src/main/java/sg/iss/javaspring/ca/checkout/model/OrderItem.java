@@ -24,8 +24,8 @@ public class OrderItem {
     @ManyToOne
     private Product product;
 
-    // @ManyToOne
-    // private Order order;
+    @ManyToOne
+    private Order order;
 
     public OrderItem() {
 
