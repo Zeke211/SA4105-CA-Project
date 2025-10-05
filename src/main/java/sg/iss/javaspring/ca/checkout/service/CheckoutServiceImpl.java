@@ -15,14 +15,21 @@ import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderItemRepository;
+import sg.iss.javaspring.ca.checkout.repository.OrderRepository;
+import sg.iss.javaspring.ca.checkout.repository.ShoppingCartRepository;
 
 @Service
 @Transactional(readOnly = true)
 public class CheckoutServiceImpl implements CheckoutService {
+
     @Autowired
     CartItemRepository cartItemRepository;
     @Autowired
     OrderItemRepository orderItemRepository;
+    @Autowired
+    OrderRepository orderRepository;
+    @Autowired
+    ShoppingCartRepository shoppingCartRepository;
 
     @Override
     public List<CartItem> findAllCartItems() {
@@ -44,7 +51,18 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     public Order placeOrder(ShoppingCart shoppingCart, Customer customer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'placeOrder'");
+        Order newOrder = new Order();
+        newOrder.setCustomer(customer);
+        Order saveOrder = orderRepository.save(newOrder);
+        for (CartItem cartItem : shoppingCart.getCartItems()) {
+            createOrderItem(cartItem, saveOrder);
+        }
+        shoppingCartRepository.delete(shoppingCart);
+        return saveOrder;
+    }
+
+    @Override
+    public Optional<Order> findOrderById(Integer id) {
+        return orderRepository.findById(id);
     }
 }

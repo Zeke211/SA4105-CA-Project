@@ -1,6 +1,7 @@
 package sg.iss.javaspring.ca.checkout.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
@@ -14,5 +15,7 @@ public interface CheckoutService {
     public OrderItem createOrderItem(CartItem cartItem, Order order);
 
     public Order placeOrder(ShoppingCart shoppingCart, Customer customer);
+
+    public Optional<Order> findOrderById(Integer id);
 
 }
