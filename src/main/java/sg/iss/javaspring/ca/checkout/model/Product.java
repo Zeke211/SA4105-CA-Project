@@ -16,7 +16,7 @@ import jakarta.persistence.GenerationType;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +37,8 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<OrderItem> orderItems;
 
+    public Product(String name, double unitPrice) {
+        this.name = name;
+        this.unitPrice = unitPrice;
+    }
 }

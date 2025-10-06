@@ -29,11 +29,11 @@ public class Order {
     // private double discountTotal;
     // private double grandTotal;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems;
+    // @OneToMany(mappedBy = "order")
+    // private List<OrderItem> orderItems;
 
-    @ManyToOne
-    private Customer customer;
+    // @ManyToOne
+    // private Customer customer;
 
     public Order() {
     }

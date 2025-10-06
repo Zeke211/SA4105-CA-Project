@@ -31,9 +31,9 @@ public class Customer {
     // private String password;
     // private String providerCustomerId;
 
-    @OneToOne(mappedBy = "customer")
-    private ShoppingCart shoppingCart;
+    // @OneToOne(mappedBy = "customer")
+    // private ShoppingCart shoppingCart;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Order> orders;
+    // @OneToMany(mappedBy = "customer")
+    // private List<Order> orders;
 }

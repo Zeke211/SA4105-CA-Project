@@ -19,10 +19,10 @@ public class ShoppingCart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToMany(mappedBy = "shoppingCart")
-    private List<CartItem> cartItems;
+    // @OneToMany(mappedBy = "shoppingCart")
+    // private List<CartItem> cartItems;
 
-    @OneToOne
-    private Customer customer;
+    // @OneToOne
+    // private Customer customer;
 
 }
