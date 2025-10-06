@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import sg.iss.javaspring.ca.checkout.model.Product;
+import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.ProductRepository;
 
 @SpringBootTest

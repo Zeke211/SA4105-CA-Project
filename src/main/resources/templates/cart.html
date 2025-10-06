@@ -5,6 +5,12 @@
   </head>
   <body>
     <table>
+      <tr>
+        <td>id</td>
+        <td>name</td>
+        <td>unitPrice</td>
+        <td>quantity</td>
+      </tr>
       <tr th:each="cartItem:${cartItems}">
         <td th:text="${cartItem.id}">id</td>
         <td th:text="${cartItem.product.name}"></td>
