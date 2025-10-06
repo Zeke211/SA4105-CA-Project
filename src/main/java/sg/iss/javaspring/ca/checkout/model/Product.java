@@ -6,13 +6,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.GenerationType;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,21 +36,5 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<OrderItem> orderItems;
-
-    public Product() {
-    }
-
-    public Product(String description, String name, double unitPrice, int stock, String category, String brand,
-            String tags, String handle, String imageURL) {
-        // this.description = description;
-        this.name = name;
-        this.unitPrice = unitPrice;
-        // this.stock = stock;
-        // this.category = category;
-        // this.brand = brand;
-        // this.tags = tags;
-        // this.handle = handle;
-        // this.imageURL = imageURL;
-    }
 
 }

@@ -12,10 +12,12 @@ import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 public interface CheckoutService {
     public List<CartItem> findAllCartItems();
 
-    public OrderItem createOrderItem(CartItem cartItem, Order order);
+    public OrderItem createOrderItem(CartItem cartItem);
 
-    public Order placeOrder(ShoppingCart shoppingCart, Customer customer);
+    // public Order placeOrder(ShoppingCart shoppingCart, Customer customer);
 
     public Optional<Order> findOrderById(Integer id);
+
+    public void deleteCartItem(CartItem cartItem);
 
 }

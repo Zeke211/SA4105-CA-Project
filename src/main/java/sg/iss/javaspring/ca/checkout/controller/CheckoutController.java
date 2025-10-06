@@ -1,5 +1,6 @@
 package sg.iss.javaspring.ca.checkout.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class CheckoutController {
     // use CartItem entity
     @GetMapping("/cart")
     public String viewCart(Model model) {
-        model.addAttribute("shoppingCart", checkoutService.findAllCartItems());
+        model.addAttribute("cartItems", checkoutService.findAllCartItems());
         return "cart";
     }
 
@@ -40,21 +41,24 @@ public class CheckoutController {
     // still use CartItem entity
     @GetMapping("/checkout")
     public String viewCheckout(Model model) {
-        model.addAttribute("shoppingCart", checkoutService.findAllCartItems());
+        model.addAttribute("cartItems", checkoutService.findAllCartItems());
         return "checkout";
     }
 
     // 3)
     // postmapping
-    // create new orderItem obj?
+    // create new orderItem obj for each cartItem obj
     // transfer items from cartItem table to orderItem table
     // create entry in order table
     @PostMapping("/checkout/order")
-    public String placeOrder(Customer customer, Model model) {
-        ShoppingCart shoppingCart = customer.getShoppingCart();
-        Order order = checkoutService.placeOrder(shoppingCart, customer);
-        model.addAttribute("order", order);
-        return "redirect:/checkout/thank-you";
+    public String placeOrder() {
+        List<CartItem> cartitem = checkoutService.findAllCartItems();
+        for (CartItem cartItems : cartitem) {
+            checkoutService.createOrderItem(cartItems);
+            checkoutService.deleteCartItem(cartItems);
+        }
+        // return "redirect:/checkout/thank-you"
+        return "thank-you";
     }
 
     @GetMapping("/checkout/{id}")

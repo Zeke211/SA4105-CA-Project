@@ -38,31 +38,36 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Transactional(readOnly = false)
     @Override
-    public OrderItem createOrderItem(CartItem cartItem, Order order) {
+    public OrderItem createOrderItem(CartItem cartItem) {
         OrderItem orderItem = new OrderItem();
-        orderItem.setOrder(order);
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setProductName(cartItem.getProduct().getName());
         orderItem.setUnitPrice(cartItem.getUnitPrice());
-        int quantity = cartItem.getQuantity();
-        orderItem.setItemTotal(quantity * orderItem.getUnitPrice());
+        orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setItemTotal(orderItem.getQuantity() * orderItem.getUnitPrice());
         return orderItemRepository.save(orderItem);
     }
 
-    @Override
-    public Order placeOrder(ShoppingCart shoppingCart, Customer customer) {
-        Order newOrder = new Order();
-        newOrder.setCustomer(customer);
-        Order saveOrder = orderRepository.save(newOrder);
-        for (CartItem cartItem : shoppingCart.getCartItems()) {
-            createOrderItem(cartItem, saveOrder);
-        }
-        shoppingCartRepository.delete(shoppingCart);
-        return saveOrder;
-    }
+    // @Transactional(readOnly = false)
+    // @Override
+    // public Order placeOrder(ShoppingCart shoppingCart, Customer customer) {
+    // Order newOrder = new Order();
+    // newOrder.setCustomer(customer);
+    // Order saveOrder = orderRepository.save(newOrder);
+    // for (CartItem cartItem : shoppingCart.getCartItems()) {
+    // createOrderItem(cartItem, saveOrder);
+    // }
+    // shoppingCartRepository.delete(shoppingCart);
+    // return saveOrder;
+    // }
 
     @Override
     public Optional<Order> findOrderById(Integer id) {
         return orderRepository.findById(id);
+    }
+
+    @Override
+    public void deleteCartItem(CartItem cartItem) {
+        cartItemRepository.delete(cartItem);
     }
 }

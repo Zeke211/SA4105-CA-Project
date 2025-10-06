@@ -19,6 +19,7 @@ public class OrderItem {
     private double unitPrice;
     // private double discount;
     // private double tax;
+    private int quantity;
     private double itemTotal;
 
     @ManyToOne
