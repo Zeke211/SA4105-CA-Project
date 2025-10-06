@@ -24,8 +24,37 @@
       <span th:text="${cartTotal}">Cart Total</span>
     </div>
     <div>
-      <form action="#" th:action="@{/checkout/order}" method="POST">
-        <!-- will add payment details field here later -->
+      <form
+        action="#"
+        th:action="@{/checkout/order}"
+        th:object="${paymentMethod}"
+        method="POST"
+      >
+        <!-- payment details field here-->
+        <table>
+          <tr>
+            <th>
+              <!-- <input type="hidden" th:field="*{id}" />Enter Payment Details -->
+              <!-- only need to put this if there is existing data already -->
+            </th>
+          </tr>
+          <tr>
+            <td>Expiry Month:</td>
+            <td>
+              <input type="text" th:field="*{expiryMonth}" />
+            </td>
+            <td>Expiry Year:</td>
+            <td>
+              <input type="text" th:field="*{expiryYear}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Card Holder Name:</td>
+            <td>
+              <input type="text" th:field="*{cardHolderName}" />
+            </td>
+          </tr>
+        </table>
         <button type="submit">Place Order</button>
       </form>
     </div>

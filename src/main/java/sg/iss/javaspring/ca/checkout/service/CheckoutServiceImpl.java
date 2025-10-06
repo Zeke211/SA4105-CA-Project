@@ -12,10 +12,12 @@ import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.OrderItem;
+import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderRepository;
+import sg.iss.javaspring.ca.checkout.repository.PaymentMethodRepository;
 import sg.iss.javaspring.ca.checkout.repository.ShoppingCartRepository;
 
 @Service
@@ -30,6 +32,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     OrderRepository orderRepository;
     @Autowired
     ShoppingCartRepository shoppingCartRepository;
+    @Autowired
+    PaymentMethodRepository paymentMethodRepository;
 
     @Override
     public List<CartItem> findAllCartItems() {
@@ -75,5 +79,11 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Override
     public void deleteAllCartItems(List<CartItem> cartItems) {
         cartItemRepository.deleteAll(cartItems);
+    }
+
+    @Override
+    public void savePaymentMethod(PaymentMethod paymentMethod) {
+        // TO-DO: need to change to boolean and perform validation checks
+        paymentMethodRepository.save(paymentMethod);
     }
 }

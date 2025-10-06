@@ -7,6 +7,7 @@ import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.OrderItem;
+import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 
 public interface CheckoutService {
@@ -21,5 +22,7 @@ public interface CheckoutService {
     public void deleteCartItem(CartItem cartItem);
 
     public void deleteAllCartItems(List<CartItem> cartItems);
+
+    public void savePaymentMethod(PaymentMethod paymentMethod);
 
 }

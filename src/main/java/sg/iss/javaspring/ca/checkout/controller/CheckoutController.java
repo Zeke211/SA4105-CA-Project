@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.Order;
+import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.service.CheckoutService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,18 +44,23 @@ public class CheckoutController {
     // still use CartItem entity
     @GetMapping("/checkout")
     public String viewCheckout(Model model) {
+        // Display cart item details
         model.addAttribute("cartItems", checkoutService.findAllCartItems());
         List<CartItem> cartItems = checkoutService.findAllCartItems();
+        // Display total costs of each type of cart item
         List<Double> eachCartItemTotal = new LinkedList<Double>();
         for (CartItem cartItem : cartItems) {
             eachCartItemTotal.add(cartItem.getQuantity() * cartItem.getUnitPrice());
         }
         model.addAttribute("CartItemTotal", eachCartItemTotal);
+        // Display cart total
         double cartTotal = 0;
         for (int i = 0; i < eachCartItemTotal.size(); i++) {
             cartTotal += eachCartItemTotal.get(i);
         }
         model.addAttribute("cartTotal", cartTotal);
+        // Display payment form
+        model.addAttribute("paymentMethod", new PaymentMethod());
         return "checkout";
     }
 
@@ -64,12 +70,13 @@ public class CheckoutController {
     // transfer items from cartItem table to orderItem table
     // create entry in order table
     @PostMapping("/checkout/order")
-    public String placeOrder() {
+    public String placeOrder(@ModelAttribute("paymentMethod") PaymentMethod paymentMethod) {
         List<CartItem> cartItems = checkoutService.findAllCartItems();
         for (CartItem cartItem : cartItems) {
             checkoutService.createOrderItem(cartItem);
         }
         checkoutService.deleteAllCartItems(cartItems);
+        checkoutService.savePaymentMethod(paymentMethod);
         return "redirect:/checkout/thank-you";
         // return "thank-you";
     }
