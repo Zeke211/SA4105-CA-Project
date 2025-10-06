@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org">
+  <head>
+    <title>Cart</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>id</td>
+        <td>name</td>
+        <td>unitPrice</td>
+        <td>quantity</td>
+        <td>CartItemTotal</td>
+      </tr>
+      <tr th:each="cartItem, stat:${cartItems}">
+        <td th:text="${cartItem.id}">id</td>
+        <td th:text="${cartItem.product.name}"></td>
+        <td th:text="${cartItem.unitPrice}">unitPrice</td>
+        <td th:text="${cartItem.quantity}">quantity</td>
+        <td th:text="${CartItemTotal[stat.index]}">CartItemTotal</td>
+      </tr>
+    </table>
+    <div>
+      <span th:text="${cartTotal}">Cart Total</span>
+    </div>
+    <div>
+      <form action="#" th:action="@{/checkout/order}" method="POST">
+        <!-- will add payment details field here later -->
+        <button type="submit">Place Order</button>
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 package sg.iss.javaspring.ca.checkout.controller;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +44,17 @@ public class CheckoutController {
     @GetMapping("/checkout")
     public String viewCheckout(Model model) {
         model.addAttribute("cartItems", checkoutService.findAllCartItems());
+        List<CartItem> cartItems = checkoutService.findAllCartItems();
+        List<Double> eachCartItemTotal = new LinkedList<Double>();
+        for (CartItem cartItem : cartItems) {
+            eachCartItemTotal.add(cartItem.getQuantity() * cartItem.getUnitPrice());
+        }
+        model.addAttribute("CartItemTotal", eachCartItemTotal);
+        double cartTotal = 0;
+        for (int i = 0; i < eachCartItemTotal.size(); i++) {
+            cartTotal += eachCartItemTotal.get(i);
+        }
+        model.addAttribute("cartTotal", cartTotal);
         return "checkout";
     }
 
@@ -52,12 +65,17 @@ public class CheckoutController {
     // create entry in order table
     @PostMapping("/checkout/order")
     public String placeOrder() {
-        List<CartItem> cartitem = checkoutService.findAllCartItems();
-        for (CartItem cartItems : cartitem) {
-            checkoutService.createOrderItem(cartItems);
-            checkoutService.deleteCartItem(cartItems);
+        List<CartItem> cartItems = checkoutService.findAllCartItems();
+        for (CartItem cartItem : cartItems) {
+            checkoutService.createOrderItem(cartItem);
         }
-        // return "redirect:/checkout/thank-you"
+        checkoutService.deleteAllCartItems(cartItems);
+        return "redirect:/checkout/thank-you";
+        // return "thank-you";
+    }
+
+    @GetMapping("/checkout/thank-you")
+    public String orderSuccess() {
         return "thank-you";
     }
 

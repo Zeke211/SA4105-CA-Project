@@ -70,4 +70,10 @@ public class CheckoutServiceImpl implements CheckoutService {
     public void deleteCartItem(CartItem cartItem) {
         cartItemRepository.delete(cartItem);
     }
+
+    @Transactional(readOnly = false)
+    @Override
+    public void deleteAllCartItems(List<CartItem> cartItems) {
+        cartItemRepository.deleteAll(cartItems);
+    }
 }

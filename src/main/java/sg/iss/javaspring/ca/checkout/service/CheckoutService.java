@@ -20,4 +20,6 @@ public interface CheckoutService {
 
     public void deleteCartItem(CartItem cartItem);
 
+    public void deleteAllCartItems(List<CartItem> cartItems);
+
 }
