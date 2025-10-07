@@ -100,13 +100,15 @@ public class CheckoutController {
     // transfer items from cartItem table to orderItem table
     // create entry in order table
     @PostMapping("/checkout/order")
-    public String placeOrder(@ModelAttribute("paymentMethod") PaymentMethod paymentMethod) {
+    public String placeOrder(@ModelAttribute("paymentMethod") PaymentMethod paymentMethod, HttpSession sessionObj) {
         List<CartItem> cartItems = checkoutService.findAllCartItems();
         for (CartItem cartItem : cartItems) {
             checkoutService.createOrderItem(cartItem);
         }
         checkoutService.deleteAllCartItems(cartItems);
         checkoutService.savePaymentMethod(paymentMethod);
+        // delete dession obj
+        sessionObj.removeAttribute("newCartTotal");
         return "redirect:/checkout/thank-you";
         // return "thank-you";
     }
