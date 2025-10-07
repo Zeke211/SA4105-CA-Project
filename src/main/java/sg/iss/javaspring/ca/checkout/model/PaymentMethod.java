@@ -16,10 +16,10 @@ public class PaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int expiryMonth;
-    private int expiryYear;
+    private Integer expiryMonth;
+    private Integer expiryYear;
     private String cardBrand;
     private String cardHolderName;
-    private int lastFourDigits;
+    private Integer lastFourDigits;
     private boolean isDefault;
 }

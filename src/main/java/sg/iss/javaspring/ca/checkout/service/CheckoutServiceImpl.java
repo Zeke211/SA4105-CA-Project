@@ -81,6 +81,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         cartItemRepository.deleteAll(cartItems);
     }
 
+    @Transactional(readOnly = false)
     @Override
     public void savePaymentMethod(PaymentMethod paymentMethod) {
         // TO-DO: need to change to boolean and perform validation checks
