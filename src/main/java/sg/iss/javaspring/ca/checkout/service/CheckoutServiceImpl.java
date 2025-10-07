@@ -1,5 +1,6 @@
 package sg.iss.javaspring.ca.checkout.service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,11 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
+import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
+import sg.iss.javaspring.ca.checkout.repository.DiscountCodeRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderRepository;
 import sg.iss.javaspring.ca.checkout.repository.PaymentMethodRepository;
@@ -34,6 +37,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     ShoppingCartRepository shoppingCartRepository;
     @Autowired
     PaymentMethodRepository paymentMethodRepository;
+    @Autowired
+    DiscountCodeRepository discountCodeRepository;
 
     @Override
     public List<CartItem> findAllCartItems() {
@@ -87,4 +92,28 @@ public class CheckoutServiceImpl implements CheckoutService {
         // TO-DO: need to change to boolean and perform validation checks
         paymentMethodRepository.save(paymentMethod);
     }
+
+    @Override
+    public DiscountCode findDiscountCodeByCode(String discountCode) {
+        return discountCodeRepository.findDiscountCodeByCode(discountCode);
+    }
+
+    @Override
+    public List<Double> eachCartItemTotal(List<CartItem> cartItems) {
+        List<Double> eachCartItemTotalPrice = new LinkedList<Double>();
+        for (CartItem cartItem : cartItems) {
+            eachCartItemTotalPrice.add(cartItem.getQuantity() * cartItem.getUnitPrice());
+        }
+        return eachCartItemTotalPrice;
+    }
+
+    @Override
+    public double cartTotal(List<Double> eachCartItemTotal) {
+        double cartTotal = 0;
+        for (int i = 0; i < eachCartItemTotal.size(); i++) {
+            cartTotal += eachCartItemTotal.get(i);
+        }
+        return cartTotal;
+    }
+
 }

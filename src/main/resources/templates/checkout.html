@@ -14,14 +14,24 @@
       </tr>
       <tr th:each="cartItem, stat:${cartItems}">
         <td th:text="${cartItem.id}">id</td>
-        <td th:text="${cartItem.product.name}"></td>
+        <td th:text="${cartItem.product.name}">name</td>
         <td th:text="${cartItem.unitPrice}">unitPrice</td>
         <td th:text="${cartItem.quantity}">quantity</td>
         <td th:text="${CartItemTotal[stat.index]}">CartItemTotal</td>
       </tr>
+      <tr>
+        <td colspan="4"></td>
+        <td th:text="${cartTotal}">Cart Total</td>
+      </tr>
     </table>
     <div>
-      <span th:text="${cartTotal}">Cart Total</span>
+      <form action="#" th:action="@{/checkout/discountCode}" method="POST">
+        <span
+          >Discount Code:
+          <input type="text" name="code" />
+        </span>
+        <button type="submit">Apply Code</button>
+      </form>
     </div>
     <div>
       <form

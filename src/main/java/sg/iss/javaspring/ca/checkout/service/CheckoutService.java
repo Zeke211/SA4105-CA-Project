@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
+import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
@@ -25,4 +26,9 @@ public interface CheckoutService {
 
     public void savePaymentMethod(PaymentMethod paymentMethod);
 
+    public DiscountCode findDiscountCodeByCode(String discountCode);
+
+    public List<Double> eachCartItemTotal(List<CartItem> cartItems);
+
+    public double cartTotal(List<Double> eachCartItemTotal);
 }

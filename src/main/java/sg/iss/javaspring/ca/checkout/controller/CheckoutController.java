@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
+import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
@@ -43,28 +45,56 @@ public class CheckoutController {
     // click button on cart page that will go to checkout page
     // still use CartItem entity
     @GetMapping("/checkout")
-    public String viewCheckout(Model model) {
+    public String viewCheckout(Model model, HttpSession sessionObj) {
+
         // Display cart item details
-        model.addAttribute("cartItems", checkoutService.findAllCartItems());
         List<CartItem> cartItems = checkoutService.findAllCartItems();
+        model.addAttribute("cartItems", cartItems);
+
         // Display total costs of each type of cart item
-        List<Double> eachCartItemTotal = new LinkedList<Double>();
-        for (CartItem cartItem : cartItems) {
-            eachCartItemTotal.add(cartItem.getQuantity() * cartItem.getUnitPrice());
-        }
+        // List<Double> eachCartItemTotal = new LinkedList<Double>();
+        // for (CartItem cartItem : cartItems) {
+        // eachCartItemTotal.add(cartItem.getQuantity() * cartItem.getUnitPrice());
+        // }
+        List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
         model.addAttribute("CartItemTotal", eachCartItemTotal);
+
         // Display cart total
-        double cartTotal = 0;
-        for (int i = 0; i < eachCartItemTotal.size(); i++) {
-            cartTotal += eachCartItemTotal.get(i);
+        // double cartTotal = 0;
+        // for (int i = 0; i < eachCartItemTotal.size(); i++) {
+        // cartTotal += eachCartItemTotal.get(i);
+        // }
+        double cartTotal = checkoutService.cartTotal(eachCartItemTotal);
+        // check if newCartTotal is present in session
+        Object objCartTotal = sessionObj.getAttribute("newCartTotal");
+        if (objCartTotal != null) {
+            model.addAttribute("cartTotal", objCartTotal);
+        } else {
+            model.addAttribute("cartTotal", cartTotal);
         }
-        model.addAttribute("cartTotal", cartTotal);
         // Display payment form
         model.addAttribute("paymentMethod", new PaymentMethod());
         return "checkout";
     }
 
-    // 3)
+    // 3) postmapping(/checkout/discountCode)
+    // apply discount code logic to total price
+    @PostMapping("/checkout/discountCode")
+    public String applyDiscountCode(@RequestParam String code, HttpSession sessionObj) {
+        List<CartItem> cartItems = checkoutService.findAllCartItems();
+        List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
+        double originalCartTotal = checkoutService.cartTotal(eachCartItemTotal);
+        double newCartTotal = originalCartTotal;
+        if (checkoutService.findDiscountCodeByCode(code) != null) {
+            DiscountCode discountCode = checkoutService.findDiscountCodeByCode(code);
+            double discountPercent = discountCode.getDiscountPercent();
+            newCartTotal = originalCartTotal * (1.0 - discountPercent);
+        }
+        sessionObj.setAttribute("newCartTotal", newCartTotal);
+        return "redirect:/checkout";
+    }
+
+    // 4)
     // postmapping
     // create new orderItem obj for each cartItem obj
     // transfer items from cartItem table to orderItem table
@@ -86,14 +116,15 @@ public class CheckoutController {
         return "thank-you";
     }
 
-    @GetMapping("/checkout/{id}")
-    public String orderConfirmation(@PathVariable("id") Integer id, Model model) {
-        Optional<Order> inOrder = checkoutService.findOrderById(id);
-        if (inOrder.isPresent()) {
-            Order order = inOrder.get();
-            model.addAttribute("order", order);
-        }
-        return "thank-you";
-    }
+    // @GetMapping("/checkout/{id}")
+    // public String orderConfirmation(@PathVariable("id") Integer id, Model model)
+    // {
+    // Optional<Order> inOrder = checkoutService.findOrderById(id);
+    // if (inOrder.isPresent()) {
+    // Order order = inOrder.get();
+    // model.addAttribute("order", order);
+    // }
+    // return "thank-you";
+    // }
 
 }
