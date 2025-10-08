@@ -2,6 +2,14 @@
 <html xmlns:th="http://wwww.thymeleaf.org">
   <head>
     <title>Cart</title>
+    <script>
+      function inputSizeCheck(inputElement) {
+        const maxLength = 2;
+        if (inputElement.value.length > maxLength) {
+          inputElement.value = inputElement.value.slice(0, maxLength);
+        }
+      }
+    </script>
   </head>
   <body>
     <table>
@@ -30,8 +38,8 @@
           >Discount Code:
           <input type="text" name="code" />
         </span>
-        <span th:if="${invalidCode}" th:text="${invalidCode}"></span>
         <button type="submit">Apply Code</button>
+        <span th:if="${invalidCode}" th:text="${invalidCode}"></span>
       </form>
     </div>
     <div>
@@ -52,7 +60,14 @@
           <tr>
             <td>Card Number:</td>
             <td>
-              <input type="text" th:field="*{cardNumber}" />
+              <input
+                type="text"
+                th:field="*{cardNumber}"
+                pattern="\d{16}"
+                maxlength="16"
+                minlength="16"
+                inputmode="numeric"
+              />
             </td>
             <td
               th:if="${#fields.hasErrors('cardNumber')}"
@@ -62,7 +77,13 @@
           <tr>
             <td>Expiry Month:</td>
             <td>
-              <input type="text" th:field="*{expiryMonth}" />
+              <input
+                type="number"
+                th:field="*{expiryMonth}"
+                min="1"
+                max="12"
+                oninput="inputSizeCheck(this)"
+              />
             </td>
             <td
               th:if="${#fields.hasErrors('expiryMonth')}"
@@ -70,7 +91,13 @@
             ></td>
             <td>Expiry Year:</td>
             <td>
-              <input type="text" th:field="*{expiryYear}" />
+              <input
+                type="number"
+                th:field="*{expiryYear}"
+                min="24"
+                max="99"
+                oninput="inputSizeCheck(this)"
+              />
             </td>
             <td
               th:if="${#fields.hasErrors('expiryYear')}"
