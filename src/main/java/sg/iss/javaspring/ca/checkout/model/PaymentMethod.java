@@ -32,7 +32,7 @@ public class PaymentMethod {
     private Integer expiryYear;
     @NotNull(message = "Card Number is required")
     @Size(min = 16, max = 16)
-    @Pattern(regexp = "\\d{16}") // ensures that all 16 are digits (0-9)
+    @Pattern(regexp = "\\d{16}", message = "Card number must contain 16 digits") // ensures that all 16 are digits (0-9)
     private String cardNumber;
     private String cardBrand;
     @NotBlank(message = "Name is required")

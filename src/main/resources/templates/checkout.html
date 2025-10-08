@@ -30,6 +30,7 @@
           >Discount Code:
           <input type="text" name="code" />
         </span>
+        <span th:if="${invalidCode}" th:text="${invalidCode}"></span>
         <button type="submit">Apply Code</button>
       </form>
     </div>

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -93,17 +94,21 @@ public class CheckoutController {
     // 3) postmapping(/checkout/discountCode)
     // apply discount code logic to total price
     @PostMapping("/checkout/discountCode")
-    public String applyDiscountCode(@RequestParam String code, HttpSession sessionObj) {
+    public String applyDiscountCode(@RequestParam String code, HttpSession sessionObj,
+            RedirectAttributes redirectAttributes) {
         List<CartItem> cartItems = checkoutService.findAllCartItems();
         List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
         double originalCartTotal = checkoutService.cartTotal(eachCartItemTotal);
         double newCartTotal = originalCartTotal;
-        if (checkoutService.findDiscountCodeByCode(code) != null) {
+        if (checkoutService.findDiscountCodeByCode(code) != null
+                && checkoutService.findDiscountCodeByCode(code).getCode().equalsIgnoreCase(code)) {
             DiscountCode discountCode = checkoutService.findDiscountCodeByCode(code);
             double discountPercent = discountCode.getDiscountPercent();
             newCartTotal = originalCartTotal * (1.0 - discountPercent);
+            sessionObj.setAttribute("newCartTotal", newCartTotal);
+        } else {
+            redirectAttributes.addFlashAttribute("invalidCode", "Invalid Discount Code");
         }
-        sessionObj.setAttribute("newCartTotal", newCartTotal);
         return "redirect:/checkout";
     }
 
@@ -114,8 +119,24 @@ public class CheckoutController {
     // create entry in order table
     @PostMapping("/checkout/order")
     public String placeOrder(@Valid @ModelAttribute("paymentMethod") PaymentMethod paymentMethod,
-            BindingResult bindingResult, HttpSession sessionObj) {
+            BindingResult bindingResult, HttpSession sessionObj, Model model) {
         if (bindingResult.hasErrors()) {
+            // need to re-add the logic to display the cart items since forwarding will lose
+            // data
+            List<CartItem> cartItems = checkoutService.findAllCartItems();
+            model.addAttribute("cartItems", cartItems);
+            List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
+            model.addAttribute("CartItemTotal", eachCartItemTotal);
+            double cartTotal = checkoutService.cartTotal(eachCartItemTotal);
+            // check if newCartTotal is present in session
+            Object objCartTotal = sessionObj.getAttribute("newCartTotal");
+            if (objCartTotal != null) {
+                model.addAttribute("cartTotal", objCartTotal);
+            } else {
+                model.addAttribute("cartTotal", cartTotal);
+            }
+            // Dont need to display payment form again as original PaymentMethod object with
+            // invalid data is kept
             return "checkout";
         }
         List<CartItem> cartItems = checkoutService.findAllCartItems();
