@@ -4,6 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +22,21 @@ public class PaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @NotNull(message = "Month is required. Format: 1-12")
+    @Min(1)
+    @Max(12)
     private Integer expiryMonth;
+    @NotNull(message = "Year is required")
+    @Min(24)
+    @Max(99)
     private Integer expiryYear;
+    @NotNull(message = "Card Number is required")
+    @Size(min = 16, max = 16)
+    @Pattern(regexp = "\\d{16}") // ensures that all 16 are digits (0-9)
+    private String cardNumber;
     private String cardBrand;
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 32)
     private String cardHolderName;
     private Integer lastFourDigits;
     private boolean isDefault;

@@ -49,13 +49,35 @@
             </th>
           </tr>
           <tr>
+            <td>Card Number:</td>
+            <td>
+              <input type="text" th:field="*{cardNumber}" />
+            </td>
+            <td
+              th:if="${#fields.hasErrors('cardNumber')}"
+              th:errors="*{cardNumber}"
+            ></td>
+          </tr>
+          <tr>
             <td>Expiry Month:</td>
             <td>
               <input type="text" th:field="*{expiryMonth}" />
             </td>
+            <td
+              th:if="${#fields.hasErrors('expiryMonth')}"
+              th:errors="*{expiryMonth}"
+            ></td>
             <td>Expiry Year:</td>
             <td>
               <input type="text" th:field="*{expiryYear}" />
+            </td>
+            <td
+              th:if="${#fields.hasErrors('expiryYear')}"
+              th:errors="*{expiryYear}"
+            ></td>
+            <td>CVV</td>
+            <td>
+              <input type="text" />
             </td>
           </tr>
           <tr>
@@ -63,6 +85,10 @@
             <td>
               <input type="text" th:field="*{cardHolderName}" />
             </td>
+            <td
+              th:if="${#fields.hasErrors('cardHolderName')}"
+              th:errors="*{cardHolderName}"
+            ></td>
           </tr>
         </table>
         <button type="submit">Place Order</button>
