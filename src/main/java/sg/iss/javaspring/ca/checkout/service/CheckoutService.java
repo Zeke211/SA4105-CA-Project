@@ -14,9 +14,7 @@ import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 public interface CheckoutService {
     public List<CartItem> findAllCartItems();
 
-    public OrderItem createOrderItem(CartItem cartItem);
-
-    public Order createOrder(List<OrderItem> orderItems);
+    public OrderItem createOrderItem(CartItem cartItem, Order order);
 
     // public Order placeOrder(ShoppingCart shoppingCart, Customer customer);
 
@@ -33,6 +31,13 @@ public interface CheckoutService {
     public List<Double> eachCartItemTotal(List<CartItem> cartItems);
 
     public double cartTotal(List<Double> eachCartItemTotal);
+
+    public Order createNewOrder();
+
+    public Order setNewOrderAttributes(Order order, List<OrderItem> orderItems, double subTotal, double taxTotal,
+            double discountTotal, double grandTotal, String promoCodes);
+
+    public void saveOrder(Order order);
 
     public double calculateTaxTotal(double netTotal);
 

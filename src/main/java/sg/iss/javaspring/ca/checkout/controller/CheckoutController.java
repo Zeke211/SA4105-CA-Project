@@ -23,6 +23,7 @@ import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
+import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.service.CheckoutService;
@@ -73,12 +74,9 @@ public class CheckoutController {
         List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
         model.addAttribute("CartItemTotal", eachCartItemTotal);
 
-        // Display cart total
-        // double cartTotal = 0;
-        // for (int i = 0; i < eachCartItemTotal.size(); i++) {
-        // cartTotal += eachCartItemTotal.get(i);
-        // }
+        // Display cart total && set as session attribute for subTotal in Order
         double cartTotal = checkoutService.cartTotal(eachCartItemTotal);
+        sessionObj.setAttribute("subTotal", cartTotal);
         // check if newCartTotal is present in session
         // display taxed amount
         // calcualte taxTotal
@@ -86,21 +84,26 @@ public class CheckoutController {
         Object newCartTotal = sessionObj.getAttribute("newCartTotal");
         double tax = 0.0;
         double grandTotal = 0.0;
+        double discount = 0.0;
         if (newCartTotal != null) {
             // Display new total after discount
             model.addAttribute("cartTotal", newCartTotal);
             grandTotal = checkoutService.calculateTaxTotal((double) newCartTotal);
             tax = grandTotal - (double) newCartTotal;
-
+            // set discount as session attribute for discountTotal in Order
+            discount = cartTotal - (double) newCartTotal;
+            sessionObj.setAttribute("discountTotal", discount);
         } else {
             model.addAttribute("cartTotal", cartTotal);
             grandTotal = checkoutService.calculateTaxTotal((double) cartTotal);
             tax = grandTotal - (double) cartTotal;
         }
-        // Display GST amount
+        // Display GST amount && set as sessionObj for taxTotal in Order
         model.addAttribute("tax", tax);
-        // Display grandTotal
+        sessionObj.setAttribute("taxTotal", tax);
+        // Display grandTotal && set as sessionObj for grandTotal in Order
         model.addAttribute("grandTotal", grandTotal);
+        sessionObj.setAttribute("grandTotal", grandTotal);
         // Display payment form
         model.addAttribute("paymentMethod", new PaymentMethod());
         return "checkout";
@@ -118,6 +121,8 @@ public class CheckoutController {
         if (checkoutService.findDiscountCodeByCode(code) != null
                 && checkoutService.findDiscountCodeByCode(code).getCode().equalsIgnoreCase(code)) {
             DiscountCode discountCode = checkoutService.findDiscountCodeByCode(code);
+            // save String code from discount code into session for Order
+            sessionObj.setAttribute("code", discountCode.getCode());
             double discountPercent = discountCode.getDiscountPercent();
             newCartTotal = originalCartTotal * (1.0 - discountPercent);
             sessionObj.setAttribute("newCartTotal", newCartTotal);
@@ -154,14 +159,49 @@ public class CheckoutController {
             // invalid data is kept
             return "checkout";
         }
+        // create new order
+        Order newOrder = checkoutService.createNewOrder();
+        // create new List to store all OrderItems
+        List<OrderItem> newOrderItems = new LinkedList<OrderItem>();
+        // copy cartItems to orderItems
+        // add newly converted orderItems to newOrderItems list
+        // set Order object to each OrderItem
         List<CartItem> cartItems = checkoutService.findAllCartItems();
         for (CartItem cartItem : cartItems) {
-            checkoutService.createOrderItem(cartItem);
+            OrderItem orderItem = checkoutService.createOrderItem(cartItem, newOrder);
+            newOrderItems.add(orderItem);
         }
+        // Retrieve code from session. If null just enter empty String
+        Object codeObj = sessionObj.getAttribute("code");
+        Object subTotalObj = sessionObj.getAttribute("subTotal");
+        Object discountTotalObj = sessionObj.getAttribute("discountTotal");
+        Object taxObj = sessionObj.getAttribute("tax");
+        Object grandTotalObj = sessionObj.getAttribute("grandTotal");
+        String code = "";
+        double subTotal = 0, discountTotal = 0, taxTotal = 0, grandTotal = 0;
+        if (codeObj != null && subTotalObj != null && discountTotalObj != null && taxObj != null
+                && grandTotalObj != null) {
+            code = (String) codeObj;
+            subTotal = (double) subTotalObj;
+            discountTotal = (double) discountTotalObj;
+            taxTotal = (double) taxObj;
+            grandTotal = (double) grandTotalObj;
+        }
+        // set and save all attributes for new order
+        checkoutService.setNewOrderAttributes(newOrder, newOrderItems, subTotal, taxTotal, discountTotal, grandTotal,
+                code);
+        checkoutService.saveOrder(newOrder);
+        // delete existing cart items
         checkoutService.deleteAllCartItems(cartItems);
+        // save payment method
         checkoutService.savePaymentMethod(paymentMethod);
-        // delete dession obj
+        // delete session obj
         sessionObj.removeAttribute("newCartTotal");
+        sessionObj.removeAttribute("code");
+        sessionObj.removeAttribute("subTotal");
+        sessionObj.removeAttribute("discountTotal");
+        sessionObj.removeAttribute("tax");
+        sessionObj.removeAttribute("grandTotal");
         return "redirect:/checkout/thank-you";
         // return "thank-you";
     }

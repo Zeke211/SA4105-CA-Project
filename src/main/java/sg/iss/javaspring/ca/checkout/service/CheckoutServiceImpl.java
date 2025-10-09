@@ -1,5 +1,6 @@
 package sg.iss.javaspring.ca.checkout.service;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -47,13 +48,14 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Transactional(readOnly = false)
     @Override
-    public OrderItem createOrderItem(CartItem cartItem) {
+    public OrderItem createOrderItem(CartItem cartItem, Order order) {
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setProductName(cartItem.getProduct().getName());
         orderItem.setUnitPrice(cartItem.getUnitPrice());
         orderItem.setQuantity(cartItem.getQuantity());
         orderItem.setItemTotal(orderItem.getQuantity() * orderItem.getUnitPrice());
+        orderItem.setOrders(order);
         return orderItemRepository.save(orderItem);
     }
 
@@ -115,11 +117,11 @@ public class CheckoutServiceImpl implements CheckoutService {
         return cartTotal;
     }
 
+    @Transactional(readOnly = false)
     @Override
-    public Order createOrder(List<OrderItem> orderItems) {
+    public Order createNewOrder() {
         Order newOrder = new Order();
-        newOrder.setOrderItems(orderItems);
-        return orderRepository.save(newOrder);
+        return newOrder;
     }
 
     @Override
@@ -133,4 +135,23 @@ public class CheckoutServiceImpl implements CheckoutService {
         return 0.09;
     }
 
+    @Transactional(readOnly = false)
+    @Override
+    public Order setNewOrderAttributes(Order order, List<OrderItem> orderItems, double subTotal, double taxTotal,
+            double discountTotal, double grandTotal, String promoCodes) {
+        order.setCreatedAt(LocalDateTime.now());
+        order.setSubTotal(subTotal);
+        order.setTaxTotal(taxTotal);
+        order.setDiscountTotal(discountTotal);
+        order.setGrandTotal(grandTotal);
+        order.setPromoCodes(promoCodes);
+        order.setOrderItems(orderItems);
+
+        return order;
+    }
+
+    @Override
+    public void saveOrder(Order order) {
+        orderRepository.save(order);
+    }
 }
