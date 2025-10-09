@@ -80,12 +80,27 @@ public class CheckoutController {
         // }
         double cartTotal = checkoutService.cartTotal(eachCartItemTotal);
         // check if newCartTotal is present in session
-        Object objCartTotal = sessionObj.getAttribute("newCartTotal");
-        if (objCartTotal != null) {
-            model.addAttribute("cartTotal", objCartTotal);
+        // display taxed amount
+        // calcualte taxTotal
+        // display taxTotal
+        Object newCartTotal = sessionObj.getAttribute("newCartTotal");
+        double tax = 0.0;
+        double grandTotal = 0.0;
+        if (newCartTotal != null) {
+            // Display new total after discount
+            model.addAttribute("cartTotal", newCartTotal);
+            grandTotal = checkoutService.calculateTaxTotal((double) newCartTotal);
+            tax = grandTotal - (double) newCartTotal;
+
         } else {
             model.addAttribute("cartTotal", cartTotal);
+            grandTotal = checkoutService.calculateTaxTotal((double) cartTotal);
+            tax = grandTotal - (double) cartTotal;
         }
+        // Display GST amount
+        model.addAttribute("tax", tax);
+        // Display grandTotal
+        model.addAttribute("grandTotal", grandTotal);
         // Display payment form
         model.addAttribute("paymentMethod", new PaymentMethod());
         return "checkout";

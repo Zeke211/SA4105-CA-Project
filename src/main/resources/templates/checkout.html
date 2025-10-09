@@ -28,8 +28,19 @@
         <td th:text="${CartItemTotal[stat.index]}">CartItemTotal</td>
       </tr>
       <tr>
-        <td colspan="4"></td>
+        <td colspan="3"></td>
+        <td>Sub Total</td>
         <td th:text="${cartTotal}">Cart Total</td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td>GST</td>
+        <td th:text="${#numbers.formatDecimal(tax,1,2)}">GST</td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td>Grand Total</td>
+        <td th:text="${#numbers.formatDecimal(grandTotal,1,2)}">Grand Total</td>
       </tr>
     </table>
     <div>

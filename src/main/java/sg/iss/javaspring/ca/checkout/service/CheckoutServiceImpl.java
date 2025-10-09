@@ -89,7 +89,6 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Transactional(readOnly = false)
     @Override
     public void savePaymentMethod(PaymentMethod paymentMethod) {
-        // TO-DO: need to change to boolean and perform validation checks
         paymentMethodRepository.save(paymentMethod);
     }
 
@@ -114,6 +113,24 @@ public class CheckoutServiceImpl implements CheckoutService {
             cartTotal += eachCartItemTotal.get(i);
         }
         return cartTotal;
+    }
+
+    @Override
+    public Order createOrder(List<OrderItem> orderItems) {
+        Order newOrder = new Order();
+        newOrder.setOrderItems(orderItems);
+        return orderRepository.save(newOrder);
+    }
+
+    @Override
+    public double calculateTaxTotal(double netTotal) {
+        double taxTotal = netTotal * (1 + getCurrentGST());
+        return taxTotal;
+    }
+
+    @Override
+    public double getCurrentGST() {
+        return 0.09;
     }
 
 }

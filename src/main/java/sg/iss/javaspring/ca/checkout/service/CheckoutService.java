@@ -16,6 +16,8 @@ public interface CheckoutService {
 
     public OrderItem createOrderItem(CartItem cartItem);
 
+    public Order createOrder(List<OrderItem> orderItems);
+
     // public Order placeOrder(ShoppingCart shoppingCart, Customer customer);
 
     public Optional<Order> findOrderById(Integer id);
@@ -31,4 +33,8 @@ public interface CheckoutService {
     public List<Double> eachCartItemTotal(List<CartItem> cartItems);
 
     public double cartTotal(List<Double> eachCartItemTotal);
+
+    public double calculateTaxTotal(double netTotal);
+
+    public double getCurrentGST();
 }
