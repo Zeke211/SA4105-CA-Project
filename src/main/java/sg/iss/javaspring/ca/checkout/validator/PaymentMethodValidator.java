@@ -23,8 +23,14 @@ public class PaymentMethodValidator implements Validator {
     public void validate(Object target, Errors errors) {
         PaymentMethod paymentMethod = (PaymentMethod) target;
         YearMonth now = YearMonth.now();
+        Integer mm = paymentMethod.getExpiryMonth();
+        Integer yy = paymentMethod.getExpiryYear();
         if (paymentMethod.getExpiryMonth() != null & paymentMethod.getExpiryYear() != null) {
-            YearMonth submittedDate = YearMonth.of(paymentMethod.getExpiryYear(), paymentMethod.getExpiryMonth());
+            int year = 0;
+            if (yy < 100) {
+                year = 2000 + yy;
+            }
+            YearMonth submittedDate = YearMonth.of(year, mm);
             if (submittedDate.isBefore(now)) {
                 errors.rejectValue("expiryYear", "errors.year.expiry", "Card has expired. Use another card.");
             }

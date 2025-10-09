@@ -143,6 +143,7 @@ public class CheckoutController {
         if (bindingResult.hasErrors()) {
             // need to re-add the logic to display the cart items since forwarding will lose
             // data
+            // TO-DO: need to re display gst tax amount and grand total
             List<CartItem> cartItems = checkoutService.findAllCartItems();
             model.addAttribute("cartItems", cartItems);
             List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
@@ -161,6 +162,8 @@ public class CheckoutController {
         }
         // create new order
         Order newOrder = checkoutService.createNewOrder();
+        // save new empty order to persist it
+        checkoutService.saveOrder(newOrder);
         // create new List to store all OrderItems
         List<OrderItem> newOrderItems = new LinkedList<OrderItem>();
         // copy cartItems to orderItems
@@ -175,7 +178,7 @@ public class CheckoutController {
         Object codeObj = sessionObj.getAttribute("code");
         Object subTotalObj = sessionObj.getAttribute("subTotal");
         Object discountTotalObj = sessionObj.getAttribute("discountTotal");
-        Object taxObj = sessionObj.getAttribute("tax");
+        Object taxObj = sessionObj.getAttribute("taxTotal");
         Object grandTotalObj = sessionObj.getAttribute("grandTotal");
         String code = "";
         double subTotal = 0, discountTotal = 0, taxTotal = 0, grandTotal = 0;
@@ -200,7 +203,7 @@ public class CheckoutController {
         sessionObj.removeAttribute("code");
         sessionObj.removeAttribute("subTotal");
         sessionObj.removeAttribute("discountTotal");
-        sessionObj.removeAttribute("tax");
+        sessionObj.removeAttribute("taxTotal");
         sessionObj.removeAttribute("grandTotal");
         return "redirect:/checkout/thank-you";
         // return "thank-you";

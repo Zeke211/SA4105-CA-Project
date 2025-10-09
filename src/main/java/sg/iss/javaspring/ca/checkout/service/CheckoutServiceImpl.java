@@ -150,6 +150,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         return order;
     }
 
+    @Transactional(readOnly = false)
     @Override
     public void saveOrder(Order order) {
         orderRepository.save(order);
