@@ -6,7 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Data
+@Getter
+@Setter
 public class CheckoutDTO {
     // PaymentMethod attributes
     @NotNull(message = "Month is required. Format: 1-12")
@@ -27,6 +33,6 @@ public class CheckoutDTO {
 
     // Shipment attributes
     @NotNull(message = "Delivery option is required")
-    private String seviceLevel; // standard or express
+    private String serviceLevel; // standard or express
 
 }

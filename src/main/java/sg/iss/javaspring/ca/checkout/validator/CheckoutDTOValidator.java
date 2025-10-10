@@ -6,13 +6,13 @@ import org.springframework.validation.Validator;
 
 import java.time.YearMonth;
 
-import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
+import sg.iss.javaspring.ca.checkout.model.CheckoutDTO;
 
 @Component
-public class PaymentMethodValidator implements Validator {
+public class CheckoutDTOValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {
-        return PaymentMethod.class.isAssignableFrom(clazz);
+        return CheckoutDTO.class.isAssignableFrom(clazz);
     }
 
     // Instances where value is rejected
@@ -21,11 +21,11 @@ public class PaymentMethodValidator implements Validator {
     // if current year = expiry year -> check if current month > expiry month
     @Override
     public void validate(Object target, Errors errors) {
-        PaymentMethod paymentMethod = (PaymentMethod) target;
+        CheckoutDTO checkoutDTO = (CheckoutDTO) target;
         YearMonth now = YearMonth.now();
-        Integer mm = paymentMethod.getExpiryMonth();
-        Integer yy = paymentMethod.getExpiryYear();
-        if (paymentMethod.getExpiryMonth() != null & paymentMethod.getExpiryYear() != null) {
+        Integer mm = checkoutDTO.getExpiryMonth();
+        Integer yy = checkoutDTO.getExpiryYear();
+        if (checkoutDTO.getExpiryMonth() != null && checkoutDTO.getExpiryYear() != null) {
             int year = 0;
             if (yy < 100) {
                 year = 2000 + yy;

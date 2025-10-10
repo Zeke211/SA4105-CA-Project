@@ -57,10 +57,25 @@
       <form
         action="#"
         th:action="@{/checkout/order}"
-        th:object="${paymentMethod}"
+        th:object="${checkoutForm}"
         method="POST"
       >
-        <!-- payment details field here-->
+        <!-- delivery option and payment details field here-->
+        <label>Delivery:</label>
+        <label for="deliveryServiceLevel">Express</label>
+        <input
+          type="radio"
+          id="express"
+          th:field="*{serviceLevel}"
+          value="express"
+        />
+        <label for="deliveryServiceLevel">Standard</label>
+        <input
+          type="radio"
+          id="standard"
+          th:field="*{serviceLevel}"
+          value="standard"
+        />
         <table>
           <tr>
             <th>

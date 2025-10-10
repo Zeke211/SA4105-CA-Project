@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import sg.iss.javaspring.ca.checkout.model.CartItem;
+import sg.iss.javaspring.ca.checkout.model.CheckoutDTO;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
@@ -44,5 +45,7 @@ public interface CheckoutService {
 
     public double getCurrentGST();
 
-    public Shipment createShipment(Order order);
+    // public Shipment setNewShipmentAttributes(Order order, Shipment shipment);
+
+    public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order);
 }

@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import sg.iss.javaspring.ca.checkout.model.CartItem;
+import sg.iss.javaspring.ca.checkout.model.CheckoutDTO;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
@@ -27,7 +28,7 @@ import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.service.CheckoutService;
-import sg.iss.javaspring.ca.checkout.validator.PaymentMethodValidator;
+import sg.iss.javaspring.ca.checkout.validator.CheckoutDTOValidator;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +38,7 @@ public class CheckoutController {
     @Autowired
     CheckoutService checkoutService;
     @Autowired
-    private PaymentMethodValidator paymentMethodValidator;
+    private CheckoutDTOValidator paymentMethodValidator;
 
     @InitBinder
     private void initPaymentMethodValidator(WebDataBinder binder) {
@@ -105,7 +106,7 @@ public class CheckoutController {
         model.addAttribute("grandTotal", grandTotal);
         sessionObj.setAttribute("grandTotal", grandTotal);
         // Display payment form
-        model.addAttribute("paymentMethod", new PaymentMethod());
+        model.addAttribute("checkoutForm", new CheckoutDTO());
         return "checkout";
     }
 
@@ -138,7 +139,7 @@ public class CheckoutController {
     // transfer items from cartItem table to orderItem table
     // create entry in order table
     @PostMapping("/checkout/order")
-    public String placeOrder(@Valid @ModelAttribute("paymentMethod") PaymentMethod paymentMethod,
+    public String placeOrder(@Valid @ModelAttribute("checkoutForm") CheckoutDTO checkoutDTO,
             BindingResult bindingResult, HttpSession sessionObj, Model model) {
         if (bindingResult.hasErrors()) {
             // need to re-add the logic to display the cart items since forwarding will lose
@@ -170,8 +171,6 @@ public class CheckoutController {
         }
         // create new order
         Order newOrder = checkoutService.createNewOrder();
-        // save new empty order to persist it
-        checkoutService.saveOrder(newOrder);
         // create new List to store all OrderItems
         List<OrderItem> newOrderItems = new LinkedList<OrderItem>();
         // copy cartItems to orderItems
@@ -201,11 +200,8 @@ public class CheckoutController {
         // set and save all attributes for new order
         checkoutService.setNewOrderAttributes(newOrder, newOrderItems, subTotal, taxTotal, discountTotal, grandTotal,
                 code);
-        checkoutService.saveOrder(newOrder);
         // delete existing cart items
         checkoutService.deleteAllCartItems(cartItems);
-        // save payment method
-        checkoutService.savePaymentMethod(paymentMethod);
         // delete session obj
         sessionObj.removeAttribute("newCartTotal");
         sessionObj.removeAttribute("code");
@@ -213,8 +209,8 @@ public class CheckoutController {
         sessionObj.removeAttribute("discountTotal");
         sessionObj.removeAttribute("taxTotal");
         sessionObj.removeAttribute("grandTotal");
-        // create new shipment record
-
+        // save payment method && shipment service level
+        checkoutService.processOrderSubmission(checkoutDTO, newOrder);
         return "redirect:/checkout/thank-you";
         // return "thank-you";
     }

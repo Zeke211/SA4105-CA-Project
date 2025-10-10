@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import sg.iss.javaspring.ca.checkout.model.CartItem;
+import sg.iss.javaspring.ca.checkout.model.CheckoutDTO;
 import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
@@ -125,7 +126,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Override
     public Order createNewOrder() {
         Order newOrder = new Order();
-        return newOrder;
+        return orderRepository.save(newOrder);
     }
 
     @Override
@@ -150,8 +151,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setGrandTotal(grandTotal);
         order.setPromoCodes(promoCodes);
         order.setOrderItems(orderItems);
-
-        return order;
+        return orderRepository.save(order);
     }
 
     @Transactional(readOnly = false)
@@ -160,12 +160,39 @@ public class CheckoutServiceImpl implements CheckoutService {
         orderRepository.save(order);
     }
 
+    // change to set shipment attributes
+    // remove the create new shipment since processOrderSubmission is creating that
+    // instead
+    // @Transactional(readOnly = false)
+    // @Override
+    // public Shipment setNewShipmentAttributes(Order order, Shipment shipment) {
+    // // Shipment shipment = new Shipment();
+    // shipment.setOrders(order);
+    // shipmentRepository.save(shipment);
+    // return shipment;
+    // }
+
     @Transactional(readOnly = false)
     @Override
-    public Shipment createShipment(Order order) {
+    public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order) {
+        // transfer PaymentMethod attributes from checkoutDTO to PaymentMethod
+        PaymentMethod paymentMethod = new PaymentMethod();
+        paymentMethod.setCardNumber(checkoutDTO.getCardNumber());
+        paymentMethod.setExpiryMonth(checkoutDTO.getExpiryMonth());
+        paymentMethod.setExpiryYear(checkoutDTO.getExpiryYear());
+        paymentMethod.setCardHolderName(checkoutDTO.getCardHolderName());
+        paymentMethodRepository.save(paymentMethod);
+        // transfer Shipment attributes from checkoutDTO to Shipment
         Shipment shipment = new Shipment();
         shipment.setOrders(order);
+        shipment.setCreatedAt(LocalDateTime.now());
+        if (checkoutDTO.getServiceLevel().equalsIgnoreCase("standard")) {
+            shipment.setSeviceLevel("standard");
+            shipment.setCourierName("NinjaVan");
+        } else {
+            shipment.setSeviceLevel("express");
+            shipment.setCourierName("SGExpress");
+        }
         shipmentRepository.save(shipment);
-        return shipment;
     }
 }
