@@ -143,19 +143,27 @@ public class CheckoutController {
         if (bindingResult.hasErrors()) {
             // need to re-add the logic to display the cart items since forwarding will lose
             // data
-            // TO-DO: need to re display gst tax amount and grand total
             List<CartItem> cartItems = checkoutService.findAllCartItems();
             model.addAttribute("cartItems", cartItems);
             List<Double> eachCartItemTotal = checkoutService.eachCartItemTotal(cartItems);
             model.addAttribute("CartItemTotal", eachCartItemTotal);
             double cartTotal = checkoutService.cartTotal(eachCartItemTotal);
             // check if newCartTotal is present in session
-            Object objCartTotal = sessionObj.getAttribute("newCartTotal");
-            if (objCartTotal != null) {
-                model.addAttribute("cartTotal", objCartTotal);
+            Object newCartTotal = sessionObj.getAttribute("newCartTotal");
+            double tax = 0.0;
+            double grandTotal = 0.0;
+            if (newCartTotal != null) {
+                model.addAttribute("cartTotal", newCartTotal);
+                grandTotal = checkoutService.calculateTaxTotal((double) newCartTotal);
+                tax = grandTotal - (double) newCartTotal;
             } else {
                 model.addAttribute("cartTotal", cartTotal);
+                grandTotal = checkoutService.calculateTaxTotal((double) cartTotal);
+                tax = grandTotal - (double) cartTotal;
             }
+            // Display GST amount && grandTotal again
+            model.addAttribute("tax", tax);
+            model.addAttribute("grandTotal", grandTotal);
             // Dont need to display payment form again as original PaymentMethod object with
             // invalid data is kept
             return "checkout";
@@ -205,6 +213,8 @@ public class CheckoutController {
         sessionObj.removeAttribute("discountTotal");
         sessionObj.removeAttribute("taxTotal");
         sessionObj.removeAttribute("grandTotal");
+        // create new shipment record
+
         return "redirect:/checkout/thank-you";
         // return "thank-you";
     }

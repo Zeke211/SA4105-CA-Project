@@ -9,6 +9,7 @@ import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
+import sg.iss.javaspring.ca.checkout.model.Shipment;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 
 public interface CheckoutService {
@@ -42,4 +43,6 @@ public interface CheckoutService {
     public double calculateTaxTotal(double netTotal);
 
     public double getCurrentGST();
+
+    public Shipment createShipment(Order order);
 }

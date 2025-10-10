@@ -40,7 +40,7 @@ public class Order {
     // @ManyToOne
     // private Customer customer;
 
-    // @OneToOne(mappedBy = "orders")
-    // private Shipment shipment;
+    @OneToOne(mappedBy = "orders")
+    private Shipment shipment;
 
 }

@@ -16,12 +16,14 @@ import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Order;
 import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
+import sg.iss.javaspring.ca.checkout.model.Shipment;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.DiscountCodeRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderItemRepository;
 import sg.iss.javaspring.ca.checkout.repository.OrderRepository;
 import sg.iss.javaspring.ca.checkout.repository.PaymentMethodRepository;
+import sg.iss.javaspring.ca.checkout.repository.ShipmentRepository;
 import sg.iss.javaspring.ca.checkout.repository.ShoppingCartRepository;
 
 @Service
@@ -40,6 +42,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     PaymentMethodRepository paymentMethodRepository;
     @Autowired
     DiscountCodeRepository discountCodeRepository;
+    @Autowired
+    ShipmentRepository shipmentRepository;
 
     @Override
     public List<CartItem> findAllCartItems() {
@@ -154,5 +158,14 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Override
     public void saveOrder(Order order) {
         orderRepository.save(order);
+    }
+
+    @Transactional(readOnly = false)
+    @Override
+    public Shipment createShipment(Order order) {
+        Shipment shipment = new Shipment();
+        shipment.setOrders(order);
+        shipmentRepository.save(shipment);
+        return shipment;
     }
 }
