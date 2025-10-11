@@ -40,6 +40,11 @@ public class CheckoutController {
     @Autowired
     private CheckoutDTOValidator paymentMethodValidator;
 
+    // Hardcode customer
+    Customer hardcodeCustomer = new Customer("Bob123", "Bob", "Jones", "12345678", "bobJones@email.com",
+            "BobbyStreet12",
+            "Singapore", 123456);
+
     @InitBinder
     private void initPaymentMethodValidator(WebDataBinder binder) {
         binder.addValidators(paymentMethodValidator);
@@ -170,7 +175,7 @@ public class CheckoutController {
             return "checkout";
         }
         // create new order
-        Order newOrder = checkoutService.createNewOrder();
+        Order newOrder = checkoutService.createNewOrder(hardcodeCustomer);
         // create new List to store all OrderItems
         List<OrderItem> newOrderItems = new LinkedList<OrderItem>();
         // copy cartItems to orderItems
@@ -210,7 +215,7 @@ public class CheckoutController {
         sessionObj.removeAttribute("taxTotal");
         sessionObj.removeAttribute("grandTotal");
         // save payment method && shipment service level
-        checkoutService.processOrderSubmission(checkoutDTO, newOrder);
+        checkoutService.processOrderSubmission(checkoutDTO, newOrder, hardcodeCustomer);
         return "redirect:/checkout/thank-you";
         // return "thank-you";
     }

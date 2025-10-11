@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://wwww.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
   <head>
     <title>Cart</title>
     <script>
@@ -87,18 +87,14 @@
             <td>Card Number:</td>
             <td>
               <input
-                type="text"
-                th:field="*{cardNumber}"
+                type="number"
                 pattern="\d{16}"
                 maxlength="16"
                 minlength="16"
                 inputmode="numeric"
               />
             </td>
-            <td
-              th:if="${#fields.hasErrors('cardNumber')}"
-              th:errors="*{cardNumber}"
-            ></td>
+            <td></td>
           </tr>
           <tr>
             <td>Expiry Month:</td>

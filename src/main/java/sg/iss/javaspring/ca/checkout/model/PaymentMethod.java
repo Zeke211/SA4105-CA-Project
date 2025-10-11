@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -30,14 +31,18 @@ public class PaymentMethod {
     @Min(24)
     @Max(99)
     private Integer expiryYear;
-    @NotNull(message = "Card Number is required")
-    @Size(min = 16, max = 16)
-    @Pattern(regexp = "\\d{16}", message = "Card number must contain 16 digits") // ensures that all 16 are digits (0-9)
-    private String cardNumber;
+    // @NotNull(message = "Card Number is required")
+    // @Size(min = 16, max = 16)
+    // @Pattern(regexp = "\\d{16}", message = "Card number must contain 16 digits")
+    // // ensures that all 16 are digits (0-9)
+    // private String cardNumber;
     private String cardBrand;
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 32)
     private String cardHolderName;
     private Integer lastFourDigits;
     private boolean isDefault;
+
+    @ManyToOne
+    private Customer customer;
 }

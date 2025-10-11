@@ -17,23 +17,37 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+
 public class Customer {
     @Id
     private String username;
-    // private String firstName;
-    // private String lastName;
-    // private String phoneNumber;
-    // private String email;
-    // private String address;
-    // private String country;
-    // private int postalCode;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String email;
+    private String address;
+    private String country;
+    private int postalCode;
     // private String password;
     // private String providerCustomerId;
 
+    public Customer(String username, String firstName, String lastName, String phoneNumber, String email,
+            String address, String country, int postalCode) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+        this.country = country;
+        this.postalCode = postalCode;
+    }
+
     // @OneToOne(mappedBy = "customer")
     // private ShoppingCart shoppingCart;
+    @OneToMany(mappedBy = "customer")
+    private List<PaymentMethod> paymentMethods;
 
-    // @OneToMany(mappedBy = "customer")
-    // private List<Order> orders;
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orders;
 }

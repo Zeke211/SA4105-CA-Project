@@ -124,8 +124,9 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Transactional(readOnly = false)
     @Override
-    public Order createNewOrder() {
+    public Order createNewOrder(Customer customer) {
         Order newOrder = new Order();
+        newOrder.setCustomer(customer);
         return orderRepository.save(newOrder);
     }
 
@@ -174,13 +175,13 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Transactional(readOnly = false)
     @Override
-    public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order) {
+    public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order, Customer customer) {
         // transfer PaymentMethod attributes from checkoutDTO to PaymentMethod
         PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setCardNumber(checkoutDTO.getCardNumber());
         paymentMethod.setExpiryMonth(checkoutDTO.getExpiryMonth());
         paymentMethod.setExpiryYear(checkoutDTO.getExpiryYear());
         paymentMethod.setCardHolderName(checkoutDTO.getCardHolderName());
+        paymentMethod.setCustomer(customer);
         paymentMethodRepository.save(paymentMethod);
         // transfer Shipment attributes from checkoutDTO to Shipment
         Shipment shipment = new Shipment();

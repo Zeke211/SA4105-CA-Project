@@ -34,7 +34,7 @@ public interface CheckoutService {
 
     public double cartTotal(List<Double> eachCartItemTotal);
 
-    public Order createNewOrder();
+    public Order createNewOrder(Customer customer);
 
     public Order setNewOrderAttributes(Order order, List<OrderItem> orderItems, double subTotal, double taxTotal,
             double discountTotal, double grandTotal, String promoCodes);
@@ -47,5 +47,5 @@ public interface CheckoutService {
 
     // public Shipment setNewShipmentAttributes(Order order, Shipment shipment);
 
-    public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order);
+    public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order, Customer customer);
 }
