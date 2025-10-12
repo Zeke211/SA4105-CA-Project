@@ -35,7 +35,7 @@ public class Order {
     private double discountTotal;
     private double grandTotal;
 
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems;
 
     @ManyToOne

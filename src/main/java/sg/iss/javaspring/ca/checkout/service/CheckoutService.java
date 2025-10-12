@@ -48,4 +48,6 @@ public interface CheckoutService {
     // public Shipment setNewShipmentAttributes(Order order, Shipment shipment);
 
     public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order, Customer customer);
+
+    public Optional<Customer> findCustomerByUsername(String username);
 }

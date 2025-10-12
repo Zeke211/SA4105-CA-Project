@@ -19,17 +19,13 @@ import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.Shipment;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
-import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
-import sg.iss.javaspring.ca.checkout.repository.DiscountCodeRepository;
-import sg.iss.javaspring.ca.checkout.repository.OrderItemRepository;
-import sg.iss.javaspring.ca.checkout.repository.OrderRepository;
-import sg.iss.javaspring.ca.checkout.repository.PaymentMethodRepository;
-import sg.iss.javaspring.ca.checkout.repository.ShipmentRepository;
-import sg.iss.javaspring.ca.checkout.repository.ShoppingCartRepository;
+import sg.iss.javaspring.ca.checkout.repository.*;
 
 @Service
 @Transactional(readOnly = true)
 public class CheckoutServiceImpl implements CheckoutService {
+
+    private final CustomerRepository customerRepository;
 
     @Autowired
     CartItemRepository cartItemRepository;
@@ -46,6 +42,10 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Autowired
     ShipmentRepository shipmentRepository;
 
+    CheckoutServiceImpl(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
     @Override
     public List<CartItem> findAllCartItems() {
         return cartItemRepository.findAll();
@@ -60,7 +60,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         orderItem.setUnitPrice(cartItem.getUnitPrice());
         orderItem.setQuantity(cartItem.getQuantity());
         orderItem.setItemTotal(orderItem.getQuantity() * orderItem.getUnitPrice());
-        orderItem.setOrders(order);
+        orderItem.setOrder(order);
         return orderItemRepository.save(orderItem);
     }
 
@@ -152,6 +152,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setGrandTotal(grandTotal);
         order.setPromoCodes(promoCodes);
         order.setOrderItems(orderItems);
+        order.setPaymentStatus("PENDING");
         return orderRepository.save(order);
     }
 
@@ -178,8 +179,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     public void processOrderSubmission(CheckoutDTO checkoutDTO, Order order, Customer customer) {
         // transfer PaymentMethod attributes from checkoutDTO to PaymentMethod
         PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setExpiryMonth(checkoutDTO.getExpiryMonth());
-        paymentMethod.setExpiryYear(checkoutDTO.getExpiryYear());
+        // paymentMethod.setExpiryMonth(checkoutDTO.getExpiryMonth());
+        // paymentMethod.setExpiryYear(checkoutDTO.getExpiryYear());
         paymentMethod.setCardHolderName(checkoutDTO.getCardHolderName());
         paymentMethod.setCustomer(customer);
         paymentMethodRepository.save(paymentMethod);
@@ -195,5 +196,10 @@ public class CheckoutServiceImpl implements CheckoutService {
             shipment.setCourierName("SGExpress");
         }
         shipmentRepository.save(shipment);
+    }
+
+    @Override
+    public Optional<Customer> findCustomerByUsername(String username) {
+        return customerRepository.findById(username);
     }
 }

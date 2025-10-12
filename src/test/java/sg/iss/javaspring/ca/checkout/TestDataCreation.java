@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import sg.iss.javaspring.ca.checkout.model.CartItem;
+import sg.iss.javaspring.ca.checkout.model.Customer;
 import sg.iss.javaspring.ca.checkout.model.DiscountCode;
 import sg.iss.javaspring.ca.checkout.model.Product;
 import sg.iss.javaspring.ca.checkout.repository.CartItemRepository;
+import sg.iss.javaspring.ca.checkout.repository.CustomerRepository;
 import sg.iss.javaspring.ca.checkout.repository.DiscountCodeRepository;
 import sg.iss.javaspring.ca.checkout.repository.ProductRepository;
 
@@ -19,9 +21,18 @@ public class TestDataCreation {
     CartItemRepository cartItemRepository;
     @Autowired
     DiscountCodeRepository discountCodeRepository;
+    @Autowired
+    CustomerRepository customerRepository;
 
     @Test
     void conTextLoad() {
+        // customer data creation
+        Customer customer1 = new Customer("Bob123", "Bob", "Jones", "12345678", "bobJones@email.com",
+                "BobbyStreet12",
+                "Singapore", 123456);
+
+        customerRepository.save(customer1);
+
         // Product data creation
         Product p1 = new Product("Bob Biscuits", 2.00);
         Product p2 = new Product("Tom Biscuits", 3.00);
