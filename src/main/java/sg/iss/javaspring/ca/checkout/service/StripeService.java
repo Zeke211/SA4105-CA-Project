@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Coupon;
+import com.stripe.model.CouponCollection;
 import com.stripe.model.checkout.Session;
+import com.stripe.param.CouponCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 
 import sg.iss.javaspring.ca.checkout.dto.StripeResponse;
@@ -52,29 +55,79 @@ public class StripeService {
                     .setCurrency("sgd")
                     .setUnitAmount(amount)
                     .setProductData(productData)
+                    .setTaxBehavior(SessionCreateParams.LineItem.PriceData.TaxBehavior.EXCLUSIVE)
                     .build();
             // Quantity
             SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
                     .setQuantity(quantity)
                     .setPriceData(priceData)
+                    .addTaxRate("txr_1SHP8CLE4e5BDmJr8uRGOfvB")
                     .build();
 
             lineItems.add(lineItem);
         }
-        SessionCreateParams params = SessionCreateParams.builder()
+        // Create Stripe session
+        SessionCreateParams.Builder sessionBuilder = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .putMetadata("orderId", String.valueOf(order.getId()))
                 .setSuccessUrl("http://localhost:8080/checkout/thank-you?session-id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl("http://localhost:8080/checkout")
                 .addAllLineItem(lineItems)
-                .build();
+                .setAutomaticTax(SessionCreateParams.AutomaticTax.builder()
+                        .setEnabled(false)
+                        .build());
+
+        // Implement discount from discount code to final price //
+        if (order.getDiscountTotal() > 0.0) {
+            Long discountAmountInCents = Math.round(order.getDiscountTotal() * 100);
+
+            try {
+                CouponCreateParams couponParams = CouponCreateParams.builder()
+                        .setName("Cart Discount")
+                        .setCurrency("sgd")
+                        .setAmountOff(discountAmountInCents)
+                        .setDuration(CouponCreateParams.Duration.ONCE)
+                        .build();
+
+                Coupon coupon = Coupon.create(couponParams);
+
+                sessionBuilder.addDiscount(SessionCreateParams.Discount.builder().setCoupon(coupon.getId()).build());
+            } catch (StripeException e) {
+                e.printStackTrace();
+                return StripeResponse.builder()
+                        .status("FAILED")
+                        .message("Could not create discount coupon" + e.getMessage())
+                        .build();
+            }
+        }
+
+        // -----Discount cannot be calculated in Stripe with a negative priced product//
+        // Create Discount name to be shown on checkout
+        // SessionCreateParams.LineItem.PriceData.ProductData discountName =
+        // SessionCreateParams.LineItem.PriceData.ProductData
+        // .builder()
+        // .setName("Discount Applied")
+        // .build();
+
+        // SessionCreateParams.LineItem discountApplied =
+        // SessionCreateParams.LineItem.builder()
+        // .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+        // .setCurrency("sgd")
+        // .setUnitAmount(discountAmountInCents)
+        // .setProductData(discountName)
+        // .setTaxBehavior(SessionCreateParams.LineItem.PriceData.TaxBehavior.INCLUSIVE)
+        // .build())
+        // .setQuantity(1L)
+        // .build();
+
+        // lineItems.add(discountApplied);
 
         // Once payment is done, if session does not throw exception we will get the
         // sessionId and sessionUrl
         Session session = null;
 
         try {
-            session = Session.create(params);
+            session = Session.create(sessionBuilder.build());
             System.out.println("[STRIPE] sessionURL=" + session.getUrl());
             return StripeResponse.builder()
                     .status("SUCCESS")
