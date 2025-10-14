@@ -147,8 +147,8 @@ public class StripeService {
         // 1) need to update paymentProcess to complete after successful checkout
         // 2) need to update paymentProcess to require authentication and denied options
         // too
-        // 3) need to update price after discount code use in stripe page
-        // 4) need to include tax too
+        // 3) need to update price after discount code use in stripe page (done)
+        // 4) need to include tax too (done)
 
     }
 

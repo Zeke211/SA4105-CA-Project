@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import sg.iss.javaspring.ca.checkout.dto.StripeResponse;
@@ -64,6 +65,11 @@ public class CheckoutController {
     // use CartItem entity
     @GetMapping("/cart")
     public String viewCart(Model model) {
+        // String username = (String) sessionObj.getAttribute("username");
+        // if (username == null) {
+        // return "redirect:/login";
+        // }
+        // model.addAttribute("username", username);
         model.addAttribute("cartItems", checkoutService.findAllCartItems());
         return "cart";
     }
