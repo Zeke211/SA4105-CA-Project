@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Cart</title>
+    <script>
+      function inputSizeCheck(inputElement) {
+        const maxLength = 2;
+        if (inputElement.value.length > maxLength) {
+          inputElement.value = inputElement.value.slice(0, maxLength);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>id</td>
+        <td>name</td>
+        <td>unitPrice</td>
+        <td>quantity</td>
+        <td>CartItemTotal</td>
+      </tr>
+      <tr th:each="cartItem, stat:${cartItems}">
+        <td th:text="${cartItem.id}">id</td>
+        <td th:text="${cartItem.product.name}">name</td>
+        <td th:text="${cartItem.unitPrice}">unitPrice</td>
+        <td th:text="${cartItem.quantity}">quantity</td>
+        <td th:text="${CartItemTotal[stat.index]}">CartItemTotal</td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td>Sub Total</td>
+        <td th:text="${cartTotal}">Cart Total</td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td>GST</td>
+        <td th:text="${#numbers.formatDecimal(tax,1,2)}">GST</td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td>Grand Total</td>
+        <td th:text="${#numbers.formatDecimal(grandTotal,1,2)}">Grand Total</td>
+      </tr>
+    </table>
+    <div>
+      <form action="#" th:action="@{/checkout/discountCode}" method="POST">
+        <span
+          >Discount Code:
+          <input type="text" name="code" />
+        </span>
+        <button type="submit">Apply Code</button>
+        <span th:if="${invalidCode}" th:text="${invalidCode}"></span>
+      </form>
+    </div>
+    <div>
+      <form
+        action="#"
+        th:action="@{/checkout/order}"
+        th:object="${checkoutForm}"
+        method="POST"
+      >
+        <!-- delivery option and payment details field here-->
+        <label>Delivery:</label>
+        <label for="deliveryServiceLevel">Express</label>
+        <input
+          type="radio"
+          id="express"
+          th:field="*{serviceLevel}"
+          value="express"
+        />
+        <label for="deliveryServiceLevel">Standard</label>
+        <input
+          type="radio"
+          id="standard"
+          th:field="*{serviceLevel}"
+          value="standard"
+        />
+        <table>
+          <tr>
+            <td>Card Holder Name:</td>
+            <td>
+              <input type="text" th:field="*{cardHolderName}" />
+            </td>
+            <td
+              th:if="${#fields.hasErrors('cardHolderName')}"
+              th:errors="*{cardHolderName}"
+            ></td>
+          </tr>
+        </table>
+        <button type="submit">Place Order</button>
+      </form>
+    </div>
+    <div
+      th:if="${stripeError}"
+      style="color: red"
+      th:text="${stripeError}"
+    ></div>
+  </body>
+</html>

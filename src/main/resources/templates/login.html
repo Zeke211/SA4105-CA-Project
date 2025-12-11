@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>Username:</td>
+        <td>
+          <input type="text" />
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Password:</td>
+        <td>
+          <input type="text" />
+        </td>
+        <td>
+          <button>Login</button>
+        </td>
+      </tr>
+    </table>
+    <form action="#" th:action="@{/user/create}" method="GET">
+      <button type="submit">Create Account</button>
+    </form>
+  </body>
+</html>

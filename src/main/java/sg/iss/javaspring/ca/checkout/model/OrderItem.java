@@ -29,7 +29,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "orderId")
-    private Order orders;
+    private Order order;
 
     public OrderItem() {
 

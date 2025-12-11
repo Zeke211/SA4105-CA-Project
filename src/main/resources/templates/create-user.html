@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create New User</title>
+  </head>
+  <body>
+    <div>
+      <form
+        action="#"
+        th:action="@{/user/create/submit}"
+        th:object="${user}"
+        method="POST"
+      >
+        <table>
+          <tr>
+            <td>Username:</td>
+            <td>
+              <input type="text" th:field="*{username}" />
+            </td>
+          </tr>
+          <tr>
+            <td>First Name:</td>
+            <td>
+              <input type="text" th:field="*{firstName}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Last Name:</td>
+            <td>
+              <input type="text" th:field="*{lastName}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Email:</td>
+            <td>
+              <input type="email" th:field="*{email}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Contact Number:</td>
+            <td>
+              <input type="text" th:field="*{phoneNumber}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Address:</td>
+            <td>
+              <input type="text" th:field="*{address}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Postal Code:</td>
+            <td>
+              <input type="text" th:field="*{postalCode}" />
+            </td>
+          </tr>
+          <tr>
+            <td>Country:</td>
+            <td>
+              <input type="text" th:field="*{country}" />
+            </td>
+          </tr>
+        </table>
+        <div>
+          <button type="submit">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

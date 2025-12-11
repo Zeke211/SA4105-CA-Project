@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import sg.iss.javaspring.ca.checkout.dto.StripeResponse;
 import sg.iss.javaspring.ca.checkout.model.CartItem;
 import sg.iss.javaspring.ca.checkout.model.CheckoutDTO;
 import sg.iss.javaspring.ca.checkout.model.Customer;
@@ -28,7 +30,8 @@ import sg.iss.javaspring.ca.checkout.model.OrderItem;
 import sg.iss.javaspring.ca.checkout.model.PaymentMethod;
 import sg.iss.javaspring.ca.checkout.model.ShoppingCart;
 import sg.iss.javaspring.ca.checkout.service.CheckoutService;
-import sg.iss.javaspring.ca.checkout.validator.CheckoutDTOValidator;
+import sg.iss.javaspring.ca.checkout.service.StripeService;
+// import sg.iss.javaspring.ca.checkout.validator.CheckoutDTOValidator;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,23 +41,35 @@ public class CheckoutController {
     @Autowired
     CheckoutService checkoutService;
     @Autowired
-    private CheckoutDTOValidator paymentMethodValidator;
+    StripeService stripeService;
+    // @Autowired
+    // private CheckoutDTOValidator paymentMethodValidator;
 
     // Hardcode customer
-    Customer hardcodeCustomer = new Customer("Bob123", "Bob", "Jones", "12345678", "bobJones@email.com",
-            "BobbyStreet12",
-            "Singapore", 123456);
-
-    @InitBinder
-    private void initPaymentMethodValidator(WebDataBinder binder) {
-        binder.addValidators(paymentMethodValidator);
+    public Customer getHardcodedCustomer() {
+        Optional<Customer> hardcodeCustomer = checkoutService.findCustomerByUsername("Bob123");
+        if (hardcodeCustomer.isPresent()) {
+            return hardcodeCustomer.get();
+        } else {
+            return null;
+        }
     }
+
+    // @InitBinder
+    // private void initPaymentMethodValidator(WebDataBinder binder) {
+    // binder.addValidators(paymentMethodValidator);
+    // }
 
     // 1)
     // getmapping basic cart page
     // use CartItem entity
     @GetMapping("/cart")
     public String viewCart(Model model) {
+        // String username = (String) sessionObj.getAttribute("username");
+        // if (username == null) {
+        // return "redirect:/login";
+        // }
+        // model.addAttribute("username", username);
         model.addAttribute("cartItems", checkoutService.findAllCartItems());
         return "cart";
     }
@@ -112,7 +127,7 @@ public class CheckoutController {
         sessionObj.setAttribute("grandTotal", grandTotal);
         // Display payment form
         model.addAttribute("checkoutForm", new CheckoutDTO());
-        return "checkout";
+        return "checkout-stripe";
     }
 
     // 3) postmapping(/checkout/discountCode)
@@ -143,9 +158,13 @@ public class CheckoutController {
     // create new orderItem obj for each cartItem obj
     // transfer items from cartItem table to orderItem table
     // create entry in order table
+    // need to adjust this for stripe
+    // when order gets placed, payment status should say "PENDING" and once payment
+    // goes through it should say "SUCCESS"
     @PostMapping("/checkout/order")
     public String placeOrder(@Valid @ModelAttribute("checkoutForm") CheckoutDTO checkoutDTO,
-            BindingResult bindingResult, HttpSession sessionObj, Model model) {
+            BindingResult bindingResult, HttpSession sessionObj, Model model, RedirectAttributes redirectAttributes) {
+        System.out.println("[Order] Recieved /checkout/order");
         if (bindingResult.hasErrors()) {
             // need to re-add the logic to display the cart items since forwarding will lose
             // data
@@ -172,10 +191,10 @@ public class CheckoutController {
             model.addAttribute("grandTotal", grandTotal);
             // Dont need to display payment form again as original PaymentMethod object with
             // invalid data is kept
-            return "checkout";
+            return "checkout-stripe";
         }
         // create new order
-        Order newOrder = checkoutService.createNewOrder(hardcodeCustomer);
+        Order newOrder = checkoutService.createNewOrder(getHardcodedCustomer());
         // create new List to store all OrderItems
         List<OrderItem> newOrderItems = new LinkedList<OrderItem>();
         // copy cartItems to orderItems
@@ -215,8 +234,22 @@ public class CheckoutController {
         sessionObj.removeAttribute("taxTotal");
         sessionObj.removeAttribute("grandTotal");
         // save payment method && shipment service level
-        checkoutService.processOrderSubmission(checkoutDTO, newOrder, hardcodeCustomer);
-        return "redirect:/checkout/thank-you";
+        checkoutService.processOrderSubmission(checkoutDTO, newOrder, getHardcodedCustomer());
+        // check before calling stripe
+        System.out.println("[Order] newOrder id: " + newOrder.getId());
+        System.out.println("[Order] newOrderItems: " + newOrderItems.size());
+        // call stripe service
+        StripeResponse stripeResponse = stripeService.payProducts(newOrderItems, newOrder);
+        System.out.println("[Order] stripe status=" + stripeResponse.getStatus() +
+                "url=" + stripeResponse.getSessionUrl() +
+                "msg=" + stripeResponse.getMessage());
+        if ("SUCCESS".equalsIgnoreCase(stripeResponse.getStatus())) {
+            return "redirect:" + stripeResponse.getSessionUrl();
+        } else {
+            redirectAttributes.addFlashAttribute("stripeError", stripeResponse.getMessage());
+            return "redirect:/checkout-stripe";
+        }
+        // return "redirect:/checkout/thank-you";
         // return "thank-you";
     }
 
